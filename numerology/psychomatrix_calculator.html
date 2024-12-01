@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Расчет Психоматрицы</title>
+	<link href='https://fonts.googleapis.com/css?family=Open Sans' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Open Sans';font-size: 16px; 
+            margin: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+			font-size: 16px; /* Увеличенный размер шрифта */
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+			font-size: 16px; /* Увеличенный размер шрифта */
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.05);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Расчет Психоматрицы</h2>
+    <form id="calculator-form">
+        <label for="name">Имя:</label>
+        <input type="text" id="name" style="width: 240px;" placeholder="Введите имя" required>
+
+        <label for="birth-date">Дата рождения (ДД-ММ-ГГГГ):</label>
+        <input type="text" id="birth-date" style="width: 240px;" placeholder="12-03-1987" required>
+
+        <button type="button" style="width: 264px;" onclick="calculate()">Рассчитать</button>
+    </form>
+</div>
+
+<div id="overlay"></div>
+<div id="popup">
+    <h3>Результаты Расчета</h3>
+    <p id="results"></p>
+    <canvas id="chart" width="400" height="200"></canvas>
+    <div id="interpretation">
+        <h4>Интерпретация:</h4>
+        <ul>
+            <li><strong>1:</strong> сила воли и уверенность</li>
+            <li><strong>2:</strong> чувствительность, гармония в отношениях</li>
+            <li><strong>3:</strong> творческий потенциал и креативность</li>
+            <li><strong>4:</strong> трудолюбие и организованность</li>
+            <li><strong>5:</strong> интуиция и жажда свободы</li>
+            <li><strong>6:</strong> ответственность и забота</li>
+            <li><strong>7:</strong> духовность и философия</li>
+            <li><strong>8:</strong> материальный успех и амбиции</li>
+            <li><strong>9:</strong> интеллект и гуманизм</li>
+        </ul>
+    </div>
+    <button onclick="closePopup()">Закрыть</button>
+</div>
+
+
+<script>
+    // Функция для приведения числа к однозначному
+    function reduceToSingleDigit(num) {
+        while (num > 9 && num !== 11) {
+            num = Array.from(String(num), Number).reduce((a, b) => a + b, 0);
+        }
+        return num;
+    }
+
+    // Число имени
+    function calculateNameNumber(name) {
+        const letterToNumber = {
+            'А': 1, 'И': 1, 'С': 1, 'Ъ': 1,
+            'Б': 2, 'Й': 2, 'Т': 2, 'Ы': 2,
+            'В': 3, 'К': 3, 'У': 3, 'Ь': 3,
+            'Г': 4, 'Л': 4, 'Ф': 4, 'Э': 4,
+            'Д': 5, 'М': 5, 'Х': 5, 'Ю': 5,
+            'Е': 6, 'Н': 6, 'Ц': 6, 'Я': 6,
+            'Ё': 7, 'О': 7, 'Ч': 7,
+            'Ж': 8, 'П': 8, 'Ш': 8,
+            'З': 9, 'Р': 9, 'Щ': 9
+        };
+        const numbers = Array.from(name.toUpperCase()).map(char => letterToNumber[char] || 0).filter(x => x > 0);
+        return { numbers, sum: reduceToSingleDigit(numbers.reduce((a, b) => a + b, 0)) };
+    }
+
+    // Психоматрица
+    function calculatePsychomatrix(nameNumbers, birthDateNumbers, destinyNumber, soulNumber, nameNumber) {
+        const allNumbers = [...nameNumbers, ...birthDateNumbers, destinyNumber, soulNumber, nameNumber];
+        const counts = Array(10).fill(0);
+        allNumbers.forEach(num => counts[num]++);
+        return counts;
+    }
+
+    function calculate() {
+        const name = document.getElementById("name").value.trim();
+        const birthDate = document.getElementById("birth-date").value.trim();
+        
+        if (!name || !birthDate.match(/^\d{2}-\d{2}-\d{4}$/)) {
+            alert("Введите корректные данные!");
+            return;
+        }
+
+        const birthDateNumbers = birthDate.replace(/-/g, "").split("").map(Number);
+        const destinyNumber = reduceToSingleDigit(birthDateNumbers.reduce((a, b) => a + b, 0));
+        const [day, month] = birthDate.split("-").slice(0, 2).map(Number);
+        const soulNumber = reduceToSingleDigit(day + month);
+        const { numbers: nameNumbers, sum: nameNumber } = calculateNameNumber(name);
+        const psychomatrix = calculatePsychomatrix(nameNumbers, birthDateNumbers, destinyNumber, soulNumber, nameNumber);
+
+        // Отобразить результаты
+        document.getElementById("results").innerText = `
+            Число судьбы: ${destinyNumber}
+            Число души: ${soulNumber}
+            Число имени: ${nameNumber}
+        `;
+        drawChart(psychomatrix.slice(1));
+        showPopup();
+    }
+
+    function drawChart(data) {
+        const ctx = document.getElementById("chart").getContext("2d");
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+                datasets: [{
+                    label: "Частота повторений",
+                    data,
+                    backgroundColor: data.map(val => val > 0 ? "red" : "gray"),
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    function showPopup() {
+        document.getElementById("popup").style.display = "block";
+        document.getElementById("overlay").style.display = "block";
+    }
+
+    function closePopup() {
+        document.getElementById("popup").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
+    }
+</script>
+</body>
+</html>
