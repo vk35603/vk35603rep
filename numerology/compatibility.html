@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Совместимость по нумерологии</title>	
+		<link href='https://fonts.googleapis.com/css?family=Open Sans' rel='stylesheet'>	
+    <style>
+        body {
+            font-family: 'Open Sans';font-size: 16px; 
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 360px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+						font-size: 16px; /* Увеличенный размер шрифта */
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+						font-size: 16px; /* Увеличенный размер шрифта */
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e7f4e4;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Совместимость по нумерологии</h1>
+    <p>Введите даты рождения партнеров<br> в формате ДД.ММ.ГГГГ:</p>
+    <label for="date1">Дата рождения первого партнера:</label>
+    <input type="text" id="date1" style="width: 240px;" placeholder="Например, 15.03.1990"><br>
+    
+    <label for="date2">Дата рождения второго партнера:</label>
+    <input type="text" id="date2" style="width: 240px;" placeholder="Например, 22.07.1988">
+    
+    <button style="width: 240px;" onclick="calculateCompatibility()">Рассчитать совместимость</button>
+    
+    <div id="result" class="result" style="display: none;"></div>
+</div>
+
+<script>
+    // Функция для вычисления жизненного числа
+    function calculateLifePathNumber(date) {
+        // Убираем все символы, кроме цифр
+        const digits = date.replace(/\D/g, '').split('').map(Number);
+        
+        let sum = digits.reduce((a, b) => a + b, 0);
+        while (sum > 9 && ![11, 22, 33].includes(sum)) {
+            sum = String(sum).split('').map(Number).reduce((a, b) => a + b, 0);
+        }
+        return sum;
+    }
+
+    // Функция для получения описания совместимости
+    function compatibilityDescription(number1, number2) {
+        if (number1 === number2) {
+            return "У вас схожая энергетика. Это может быть как сильным союзом, так и вызовом, если оба партнера похожи.";
+        } else if (Math.abs(number1 - number2) <= 2) {
+            return "Ваши энергии дополняют друг друга. У вас есть хорошая вероятность создать гармоничный союз.";
+        } else {
+            return "Ваши жизненные числа разные. Это может быть вызовом, но также открывает возможности для роста и обучения.";
+        }
+    }
+
+    // Основная функция расчета совместимости
+    function calculateCompatibility() {
+        const date1 = document.getElementById('date1').value;
+        const date2 = document.getElementById('date2').value;
+
+        if (!date1 || !date2) {
+            alert('Пожалуйста, введите обе даты.');
+            return;
+        }
+
+        const lifePath1 = calculateLifePathNumber(date1);
+        const lifePath2 = calculateLifePathNumber(date2);
+
+        const description = compatibilityDescription(lifePath1, lifePath2);
+
+        // Отображение результата
+        const resultDiv = document.getElementById('result');
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `
+            <p>Жизненное число первого партнера: <strong>${lifePath1}</strong></p>
+            <p>Жизненное число второго партнера: <strong>${lifePath2}</strong></p>
+            <p><strong>Совместимость:</strong> ${description}</p>
+        `;
+    }
+</script>
+
+</body>
+</html>
